@@ -14,12 +14,12 @@ class Richiesta(models.Model):
         ALTRO: 'Altro',
     }
 
-    NUOVA = 'Nuova'
+    CREATA = 'Creata'
     IN_CARICO = 'Presa in carico'
     RISOLTA = 'Risolta'
 
     STATO_CHOICES = {
-        NUOVA: 'Nuova',
+        CREATA: 'Creata',
         IN_CARICO: 'Presa in carico',
         RISOLTA: 'Risolta'
     }
