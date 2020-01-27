@@ -40,7 +40,8 @@ INSTALLED_APPS = [
     'rest_framework',
     'user_service',
     'vetture_service',
-    'corsheaders'
+    'corsheaders',
+    'richieste'
 ]
 
 MIDDLEWARE = [

@@ -1,8 +1,12 @@
-from django.core.serializers import json
+import datetime
+import json
+
 from django.core.serializers.json import DjangoJSONEncoder
 from django.http import HttpResponse
-from pronto_aiuto_rest_api.richieste.models import Richiesta
-from pronto_aiuto_rest_api.richieste.forms import RichiestaCreateForm
+from django.views.decorators.csrf import csrf_exempt
+
+from richieste.models import Richiesta
+from richieste.forms import RichiestaCreateForm
 
 
 @csrf_exempt
@@ -12,7 +16,7 @@ def richieste_list(request):
         serialized = json.dumps(list(richieste), cls=DjangoJSONEncoder)
         return HttpResponse(serialized)
 
-@csrf_exemp
+@csrf_exempt
 def crea_richiesta_cittadino(request):
     if request.method == 'POST':
         form = RichiestaCreateForm(data=request.POST)
@@ -20,7 +24,7 @@ def crea_richiesta_cittadino(request):
             imei = form.cleaned_data['imei']
             tipologia = form.cleaned_data['tipologia']
             informazioni = form.cleaned_data['informazioni']
-            data = form.cleaned_data['data']
+            data = datetime.datetime.now()
             long = form.cleaned_data['long']
             lat = form.cleaned_data['lat']
             richiesta = Richiesta(  imei=imei,
