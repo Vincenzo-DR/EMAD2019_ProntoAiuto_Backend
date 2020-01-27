@@ -31,6 +31,7 @@ class Vettura(models.Model):
     stato = models.CharField(choices=STATO_CHOICES.items(), max_length=100)
     imei  = models.CharField(max_length=15)
     playerId = models.CharField(max_length=36)
+    disponibile = models.BooleanField(default=True)
 
     def serialize(self):
         return json.dumps(self, default=lambda o: o.__dict__, sort_keys=True)
