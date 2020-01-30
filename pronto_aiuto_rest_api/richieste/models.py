@@ -1,5 +1,8 @@
 import json
+import os
+from datetime import datetime
 
+from django.conf import settings
 from django.db import models
 
 # Create your models here.
@@ -30,7 +33,7 @@ class Richiesta(models.Model):
     tipologia = models.CharField(choices=MOTIVO_CHOICES.items(), max_length=100, null=True)
     stato = models.CharField(choices=STATO_CHOICES.items(), max_length=100, null=True)
     informazioni = models.CharField(max_length=300, null=True)
-    data = models.DateField(null=True)
+    data = models.CharField(null=True, max_length=100)
     linea_verde_richiesta = models.BooleanField(default=False)
     long = models.CharField(max_length=100, null=True)
     lat = models.CharField(max_length=100, null=True)
@@ -41,6 +44,13 @@ class Richiesta(models.Model):
     def serialize(self):
         return json.dumps(self, default=lambda o: o.__dict__, sort_keys=True)
 
+def content_file_name(instance, filename):
+    year = datetime.utcnow().strftime("%Y")
+    month = datetime.utcnow().strftime("%B")
+    richiesta = str(instance.richiesta.id)
+    return os.sep.join([year, month, richiesta, filename])
+
+
 class Allegato(models.Model):
     richiesta = models.ForeignKey('Richiesta', on_delete=models.CASCADE)
-    file = models.FileField(null=True)
+    file = models.FileField(null=True,  upload_to=content_file_name, max_length=500)

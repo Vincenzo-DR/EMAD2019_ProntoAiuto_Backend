@@ -130,6 +130,9 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
+MEDIA_ROOT = os.path.join(os.path.dirname(__file__), '../media')
+MEDIA_URL = '/media/'
+
 REST_FRAMEWORK = {
     # Use Django's standard `django.contrib.auth` permissions,
     # or allow read-only access for unauthenticated users.
@@ -164,9 +167,9 @@ CORS_ALLOW_HEADERS = [
 ]
 
 CORS_ORIGIN_WHITELIST = [
-    'http://127.0.0.1:4200',
+    'http://127.0.0.1:4300',
 ]
 
 CSRF_TRUSTED_ORIGINS = [
-    'http://127.0.0.1:4200',
+    'http://127.0.0.1:4300',
 ]
