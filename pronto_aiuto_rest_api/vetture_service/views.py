@@ -101,10 +101,10 @@ def push_to_nearest(pk_request, tipo_request, lat_req, long_req):
     header = {"Content-Type": "application/json; charset=utf-8"}
 
     payload = {"app_id": "a25229e0-e3d2-419c-8706-8c0abbe60353",
-               "include_player_ids": [player_id],
+               "include_player_ids": [min(times_of_arrival, key=times_of_arrival.get)],
                "headings": {"en": "Nuova richiesta di soccorso"},
                "contents": {"en": "Emergenza per {}.".format(tipo_request)},
-               "data": {"req_pk": min(times_of_arrival, key=times_of_arrival.get)}
+               "data": {"req_pk": pk_request}
                }
 
     req = requests.post("https://onesignal.com/api/v1/notifications", headers=header, data=json.dumps(payload))
