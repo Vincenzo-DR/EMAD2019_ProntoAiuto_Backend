@@ -6,6 +6,9 @@ from django.conf import settings
 from django.db import models
 
 # Create your models here.
+from vetture_service.models import Vettura
+
+
 class Richiesta(models.Model):
     INCIDENTE = 'Incidente'
     INCENDIO = 'Incendio'
@@ -37,6 +40,7 @@ class Richiesta(models.Model):
     linea_verde_richiesta = models.BooleanField(default=False)
     long = models.CharField(max_length=100, null=True)
     lat = models.CharField(max_length=100, null=True)
+    vettura = models.ForeignKey(Vettura, on_delete=models.CASCADE, null=True, default=None)
 
     def __str__(self):
         return self.imei

@@ -41,8 +41,8 @@ class Vettura(models.Model):
 
 
 class Posizione(models.Model):
-    long = models.DecimalField(max_digits=9, decimal_places=6, null=True)
-    lat = models.DecimalField(max_digits=9, decimal_places=6, null=True)
+    long = models.CharField(max_length=20, null=True)
+    lat = models.CharField(max_length=20, null=True)
     ultimo_aggiornamento = models.DateTimeField(null=True)
     vettura = models.ForeignKey(Vettura, null=True, on_delete=models.CASCADE)
 
