@@ -9,4 +9,4 @@ class RichiestaCreateForm(forms.ModelForm):
 
     class Meta:
         model = Richiesta
-        fields = {'imei', 'tipologia', 'informazioni','long', 'lat'}
+        fields = {'imei', 'tipologia', 'informazioni', 'is_supporto' ,'long', 'lat'}

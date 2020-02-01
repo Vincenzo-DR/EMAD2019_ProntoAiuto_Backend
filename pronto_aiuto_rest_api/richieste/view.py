@@ -19,7 +19,7 @@ from vetture_service.views import push_to_nearest
 def richieste_list(request):
     if request.method == 'GET':
         richieste = Richiesta.objects.all().values('imei', 'tipologia', 'stato', 'informazioni', 'data', 'data', 'lat',
-                                                   'long')
+                                                   'long', 'is_supporto')
         serialized = json.dumps(list(richieste), cls=DjangoJSONEncoder)
         return HttpResponse(serialized)
     return HttpResponseForbidden()
@@ -34,6 +34,7 @@ def crea_richiesta_cittadino(request):
             informazioni = form.cleaned_data['informazioni']
             data = str(datetime.datetime.now())
             long = form.cleaned_data['long']
+            is_supporto = form.cleaned_data['is_supporto']
             lat = form.cleaned_data['lat']
             img_data = form.cleaned_data['img_data']
             audio_data = form.cleaned_data['audio_data']
@@ -42,6 +43,7 @@ def crea_richiesta_cittadino(request):
                                   stato=Richiesta.CREATA,
                                   informazioni=informazioni,
                                   data=data,
+                                  is_supporto=is_supporto,
                                   linea_verde_richiesta=False,
                                   long=long,
                                   lat=lat

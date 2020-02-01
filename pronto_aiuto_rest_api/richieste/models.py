@@ -13,13 +13,26 @@ class Richiesta(models.Model):
     INCIDENTE = 'Incidente'
     INCENDIO = 'Incendio'
     DISSESTISTATICI = 'Dissesti statici'
+    FURTO = 'Furto'
+    VIOLENZADOMESTICA = 'Violenza domestica'
+    MALOREIMPROVVISO = 'Malore improvviso'
     ALTRO = 'Altro'
+    TRUE = 'True'
+    FALSE = 'False'
 
     MOTIVO_CHOICES = {
         INCIDENTE: 'Incidente',
         INCENDIO: 'Incendio',
         DISSESTISTATICI: 'Dissesti statici',
-        ALTRO: 'Altro',
+        FURTO: 'Furto',
+        VIOLENZADOMESTICA: 'Violenza domestica',
+        MALOREIMPROVVISO: 'Malore improvviso',
+        ALTRO: 'Altro'
+    }
+
+    IS_SUPPORTO = {
+        TRUE: 'True',
+        FALSE: 'False'
     }
 
     CREATA = 'Creata'
@@ -34,6 +47,7 @@ class Richiesta(models.Model):
 
     imei = models.CharField(max_length=100)
     tipologia = models.CharField(choices=MOTIVO_CHOICES.items(), max_length=100, null=True)
+    is_supporto = models.CharField(choices=IS_SUPPORTO.items(), max_length=100, null=True, default="False")
     stato = models.CharField(choices=STATO_CHOICES.items(), max_length=100, null=True)
     informazioni = models.CharField(max_length=300, null=True)
     data = models.CharField(null=True, max_length=100)
