@@ -28,7 +28,7 @@ def vetture_list_position(request):
             pos = Posizione.objects.get(vettura=vet)
             vett_pos.append({'id': vet.id, 'identificativo': vet.identificativo, 'tipologia': vet.tipologia,
                              'stato': vet.stato, 'imei': vet.imei, 'playerId': vet.playerId, 'lat': pos.lat,
-                             'long': pos.long, 'ultimo_aggiornamento': pos.ultimo_aggiornamento})
+                             'long': pos.long, 'ultimo_aggiornamento': pos.ultimo_aggiornamento, 'disponibile': vet.disponibile})
         serialized = json.dumps(vett_pos, cls=DjangoJSONEncoder)
         return HttpResponse(serialized)
 

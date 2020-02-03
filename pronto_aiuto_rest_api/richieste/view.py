@@ -3,6 +3,7 @@ import json
 
 from django.core.serializers.json import DjangoJSONEncoder
 from django.http import HttpResponse, HttpResponseForbidden
+from django.shortcuts import get_object_or_404
 from django.views.decorators.csrf import csrf_exempt
 from django.core.files.base import ContentFile
 
@@ -38,6 +39,7 @@ def crea_richiesta_cittadino(request):
             lat = form.cleaned_data['lat']
             img_data = form.cleaned_data['img_data']
             audio_data = form.cleaned_data['audio_data']
+            playerID = form.cleaned_data['playerId']
             richiesta = Richiesta(imei=imei,
                                   tipologia=tipologia,
                                   stato=Richiesta.CREATA,
@@ -46,7 +48,8 @@ def crea_richiesta_cittadino(request):
                                   is_supporto=is_supporto,
                                   linea_verde_richiesta=False,
                                   long=long,
-                                  lat=lat
+                                  lat=lat,
+                                  playerId=playerID
                                   )
             richiesta.save()
             if img_data:
@@ -60,24 +63,24 @@ def crea_richiesta_cittadino(request):
 
 
 @csrf_exempt
-def rifiuta_richiesta(request, pk_richiesta, imei):
+def rifiuta_richiesta(request, imei, pk_req):
     if request.method == 'GET':
-        v = Vettura.objects.get(imei=imei)
+        v = get_object_or_404(Vettura, imei=imei)
         v.disponibile = False
         v.save()
-        r = Richiesta.objects.get(pk=pk_richiesta)
+        r = get_object_or_404(Richiesta, pk=pk_req)
         response = push_to_nearest(r.pk, r.tipologia, r.lat, r.long)
         return HttpResponse(response)
     return HttpResponseForbidden()
 
 
 @csrf_exempt
-def accetta_richiesta(request, pk_richiesta, imei):
+def accetta_richiesta(request, imei, pk_req):
     if request.method == 'GET':
-        v = Vettura.objects.get(imei=imei)
+        v = get_object_or_404(Vettura, imei=imei)
         v.disponibile = False
         v.save()
-        r = Richiesta.objects.get(pk=pk_richiesta)
+        r = get_object_or_404(Richiesta, pk=pk_req)
         r.stato = Richiesta.IN_CARICO
         r.vettura = v
         r.save()
@@ -85,21 +88,21 @@ def accetta_richiesta(request, pk_richiesta, imei):
     return HttpResponseForbidden()
 
 @csrf_exempt
-def completa_richiesta(request, pk_richiesta, imei):
+def completa_richiesta(request, imei, pk_req):
     if request.method == 'GET':
-        v = Vettura.objects.get(imei=imei)
+        v = get_object_or_404(Vettura, imei=imei)
         v.disponibile = True
         v.save()
-        r = Richiesta.objects.get(pk=pk_richiesta)
+        r = get_object_or_404(Richiesta, pk=pk_req)
         r.stato = Richiesta.RISOLTA
         r.save()
         return HttpResponse(status=200)
     return HttpResponseForbidden()
 
 @csrf_exempt
-def get_richiesta(request, pk_richiesta, imei):
+def get_richiesta(request, pk_richiesta):
     if request.method == 'GET':
-        r = Richiesta.objects.get(pk=pk_richiesta, imei=imei)
+        r = Richiesta.objects.get(pk=pk_richiesta)
         return HttpResponse(r.serialize())
     return HttpResponseForbidden()
 
