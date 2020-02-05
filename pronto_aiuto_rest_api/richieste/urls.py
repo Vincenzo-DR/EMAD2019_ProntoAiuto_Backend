@@ -1,6 +1,6 @@
 from django.conf.urls import url
 
-from richieste.view import richieste_list, crea_richiesta_cittadino, rifiuta_richiesta, accetta_richiesta, get_richiesta, completa_richiesta
+from richieste.view import richieste_list, crea_richiesta_cittadino, rifiuta_richiesta, accetta_richiesta, get_richiesta, completa_richiesta, get_richiesta_cittadino
 
 urlpatterns = [
     url(regex='^list/$',
@@ -21,4 +21,7 @@ urlpatterns = [
     url(regex='^get/(?P<pk_req>[0-9]+)/$',
         view=get_richiesta,
         name='get_richiesta'),
+    url(regex='^get/cittadino/(?P<imei>\w+)/$',
+        view=get_richiesta_cittadino,
+        name='get_richiesta_cittadino'),
 ]

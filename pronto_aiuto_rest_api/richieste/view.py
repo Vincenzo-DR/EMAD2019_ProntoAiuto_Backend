@@ -7,6 +7,7 @@ from django.shortcuts import get_object_or_404
 from django.views.decorators.csrf import csrf_exempt
 from django.core.files.base import ContentFile
 
+from Helper.NotifichePush import sendNotificaToCittadino
 from richieste.models import Richiesta, Allegato
 from richieste.forms import RichiestaCreateForm
 
@@ -19,8 +20,8 @@ from vetture_service.views import push_to_nearest
 @csrf_exempt
 def richieste_list(request):
     if request.method == 'GET':
-        richieste = Richiesta.objects.all().values('imei', 'tipologia', 'stato', 'informazioni', 'data', 'data', 'lat',
-                                                   'long', 'is_supporto')
+        richieste = Richiesta.objects.all().values('imei', 'tipologia', 'stato', 'informazioni', 'data', 'lat',
+                                                   'long', 'is_supporto', 'forza_ordine')
         serialized = json.dumps(list(richieste), cls=DjangoJSONEncoder)
         return HttpResponse(serialized)
     return HttpResponseForbidden()
@@ -37,8 +38,10 @@ def crea_richiesta_cittadino(request):
             long = form.cleaned_data['long']
             is_supporto = form.cleaned_data['is_supporto']
             lat = form.cleaned_data['lat']
+            fo = form.cleaned_data['forza_ordine']
             img_data = form.cleaned_data['img_data']
             audio_data = form.cleaned_data['audio_data']
+            selfie_data = form.cleaned_data['selfie_data']
             playerID = form.cleaned_data['playerId']
             richiesta = Richiesta(imei=imei,
                                   tipologia=tipologia,
@@ -49,13 +52,16 @@ def crea_richiesta_cittadino(request):
                                   linea_verde_richiesta=False,
                                   long=long,
                                   lat=lat,
-                                  playerId=playerID
+                                  playerId=playerID,
+                                  forza_ordine=fo
                                   )
             richiesta.save()
             if img_data:
                 Allegato(file=base64_file(img_data, 'fotoAllegata'), richiesta=richiesta).save()
             if audio_data:
                 Allegato(file=base64_file(audio_data, 'audioAllegato'), richiesta=richiesta).save()
+            if selfie_data:
+                Allegato(file=base64_file('data:image/jpeg;base64,' + selfie_data, 'selfieAllegato'), richiesta=richiesta).save()
             response = push_to_nearest(richiesta.pk, richiesta.tipologia, richiesta.lat, richiesta.long)
             print(response)
             return HttpResponse(richiesta.serialize())
@@ -84,7 +90,8 @@ def accetta_richiesta(request, imei, pk_req):
         r.stato = Richiesta.IN_CARICO
         r.vettura = v
         r.save()
-        return HttpResponse(status=200)
+        t_arrivo = round((r.tempoDiArrivo/60), 2)
+        return HttpResponse(status=sendNotificaToCittadino(r.playerId, pk_req, t_arrivo).status_code)
     return HttpResponseForbidden()
 
 @csrf_exempt
@@ -104,6 +111,16 @@ def get_richiesta(request, pk_richiesta):
     if request.method == 'GET':
         r = Richiesta.objects.get(pk=pk_richiesta)
         return HttpResponse(r.serialize())
+    return HttpResponseForbidden()\
+
+@csrf_exempt
+def get_richiesta_cittadino(request, imei):
+    richieste_list = list()
+    if request.method == 'GET':
+        r = Richiesta.objects.filter(imei=imei, stato__in=[Richiesta.CREATA, Richiesta.IN_CARICO])
+        if r.exists():
+            richieste_list.append({'id': r.first().id, 'stato': r.first().stato, 'tempoDiArrivo': r.first().tempoDiArrivo})
+        return HttpResponse(json.dumps(richieste_list, cls=DjangoJSONEncoder))
     return HttpResponseForbidden()
 
 def base64_file(data, name=None):

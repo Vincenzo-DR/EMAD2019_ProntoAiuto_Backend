@@ -6,14 +6,18 @@ from django.db import models
 class Vettura(models.Model):
     AUTOVETTURA = 'Autovettura'
     MOTOCICLO = 'Motociclo'
-    CORAZZATO = 'Corazzato'
+    AUTOCARRO = 'Autocarro'
     ELICOTTERO = 'Elicottero'
     AMBULANZA = 'Ambulanza'
+    POLIZIA = 'Polizia'
+    CARABINIERI = 'Carabinieri'
+    PARAMEDICI = 'Paramedici'
+    POMPIERI = 'Pompieri'
 
     TIPOLOGIA_CHOICES = {
         AUTOVETTURA: 'Autovettura',
         MOTOCICLO: 'Motociclo',
-        CORAZZATO: 'Corazzato',
+        AUTOCARRO: 'Autocarro',
         ELICOTTERO: 'Elicottero',
         AMBULANZA: 'Ambulanza',
     }
@@ -26,8 +30,16 @@ class Vettura(models.Model):
         NON_OPERATIVA: 'Non Operativa',
     }
 
+    FO_CHOICES = {
+        POLIZIA: 'Polizia',
+        CARABINIERI: 'Carabinieri',
+        PARAMEDICI: 'Paramedici',
+        POMPIERI: 'Pompieri'
+    }
+
     identificativo = models.CharField(max_length=100, unique=True)
     tipologia = models.CharField(choices=TIPOLOGIA_CHOICES.items(), max_length=100)
+    forza_ordine = models.CharField(choices=FO_CHOICES.items(), max_length=100, null=True)
     stato = models.CharField(choices=STATO_CHOICES.items(), max_length=100)
     imei  = models.CharField(max_length=15)
     playerId = models.CharField(max_length=36)
