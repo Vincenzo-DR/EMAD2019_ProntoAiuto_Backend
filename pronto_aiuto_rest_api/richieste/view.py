@@ -20,7 +20,7 @@ from vetture_service.views import push_to_nearest
 @csrf_exempt
 def richieste_list(request):
     if request.method == 'GET':
-        richieste = Richiesta.objects.all().values('imei', 'tipologia', 'stato', 'informazioni', 'data', 'lat',
+        richieste = Richiesta.objects.all().values('id', 'imei', 'tipologia', 'stato', 'informazioni', 'data', 'lat',
                                                    'long', 'is_supporto', 'forza_ordine')
         serialized = json.dumps(list(richieste), cls=DjangoJSONEncoder)
         return HttpResponse(serialized)
@@ -130,11 +130,10 @@ def base64_file(data, name=None):
         name = _name.split(":")[-1]
     return ContentFile(base64.b64decode(_img_str), name='{}.{}'.format(name, ext))
 
-
 @csrf_exempt
-def get_dettaglio_richiesta(request, pk_richiesta):
+def get_dettaglio_richiesta(request, pk_req):
     if request.method == 'GET':
-        r = Richiesta.objects.get(pk=pk_richiesta)
+        r = Richiesta.objects.get(pk=pk_req)
         files = Allegato.objects.filter(richiesta=r)
         fotoAllegata = None
         selfieAllegato = None
@@ -149,13 +148,13 @@ def get_dettaglio_richiesta(request, pk_richiesta):
 
         data = {
             'imei': r.imei,
-            'motivo': r.tipologia,
+            'tipologia': r.tipologia,
             'is_supporto': r.is_supporto,
             'stato': r.stato,
             'data': r.data,
             'long': r.long,
             'lat': r.lat,
-            'descrizione': r.informazioni,
+            'informazioni': r.informazioni,
             'vettura': r.vettura.identificativo,
             'vettura_imei': r.vettura.imei,
             'selfie': selfieAllegato.file.url,

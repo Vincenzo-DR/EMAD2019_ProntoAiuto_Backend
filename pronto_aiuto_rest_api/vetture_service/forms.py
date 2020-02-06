@@ -13,6 +13,11 @@ class VetturaUpdateForm(forms.ModelForm):
         model = Vettura
         fields = {'tipologia', 'imei', 'playerId', 'stato', 'forza_ordine'}
 
+class VetturaUpdateDisponibilita(forms.ModelForm):
+    class Meta:
+        model = Vettura
+        fields = {'disponibile'}
+
 class PosizioneUpdateForm(forms.ModelForm):
     class Meta:
         model = Posizione

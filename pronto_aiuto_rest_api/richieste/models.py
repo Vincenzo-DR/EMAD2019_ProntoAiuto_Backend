@@ -8,7 +8,7 @@ from django.db import models
 from vetture_service.models import Vettura
 
 class Richiesta(models.Model):
-    INCIDENTE = 'Incidente'
+    INCIDENTE = 'Incidente stradale'
     INCENDIO = 'Incendio'
     DISSESTISTATICI = 'Dissesti statici'
     FURTO = 'Furto'
@@ -26,7 +26,7 @@ class Richiesta(models.Model):
     POMPIERI = 'Pompieri'
 
     MOTIVO_CHOICES = {
-        INCIDENTE: 'Incidente',
+        INCIDENTE: 'Incidente stradale',
         INCENDIO: 'Incendio',
         DISSESTISTATICI: 'Dissesti statici',
         FURTO: 'Furto',

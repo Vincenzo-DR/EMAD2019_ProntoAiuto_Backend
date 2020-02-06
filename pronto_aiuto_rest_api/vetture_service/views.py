@@ -8,7 +8,7 @@ from django.views.decorators.csrf import csrf_exempt
 
 from Helper.NotifichePush import sendNotificaToFO
 from richieste.models import Richiesta
-from vetture_service.forms import VetturaCreateForm, VetturaUpdateForm, PosizioneUpdateForm
+from vetture_service.forms import VetturaCreateForm, VetturaUpdateForm, PosizioneUpdateForm, VetturaUpdateDisponibilita
 from vetture_service.models import Vettura, Posizione
 from datetime import datetime
 
@@ -106,3 +106,13 @@ def push_to_nearest(pk_request, tipo_request, lat_req, long_req):
     req.tempoDiArrivo = times_of_arrival.get(playerId)
     req.save()
     return sendNotificaToFO(playerId, pk_request, tipo_request).status_code
+
+@csrf_exempt
+def updateDisponibilita(request, imei):
+    vettura = get_object_or_404(Vettura, imei=imei)
+    form = VetturaUpdateDisponibilita(data=request.POST)
+    if request.method == "POST":
+        if form.is_valid():
+            vettura.disponibile = form.cleaned_data['disponibile']
+            vettura.save()
+            return HttpResponse(vettura.serialize()) \

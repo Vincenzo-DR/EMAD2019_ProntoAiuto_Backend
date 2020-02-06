@@ -37,12 +37,11 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'richieste',
     'rest_framework',
-    'corsheaders',
     'vetture_service',
+    'corsheaders',
+    'richieste'
 ]
-
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
