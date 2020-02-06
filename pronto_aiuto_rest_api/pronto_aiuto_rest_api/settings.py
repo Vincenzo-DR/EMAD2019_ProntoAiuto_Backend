@@ -38,7 +38,6 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
-    'user_service',
     'vetture_service',
     'corsheaders',
     'richieste'
@@ -168,8 +167,10 @@ CORS_ALLOW_HEADERS = [
 
 CORS_ORIGIN_WHITELIST = [
     'http://127.0.0.1:4300',
+    'http://127.0.0.1:8100',
 ]
 
 CSRF_TRUSTED_ORIGINS = [
     'http://127.0.0.1:4300',
+    'http://127.0.0.1:8100',
 ]
