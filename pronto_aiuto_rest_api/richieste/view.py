@@ -129,3 +129,38 @@ def base64_file(data, name=None):
     if not name:
         name = _name.split(":")[-1]
     return ContentFile(base64.b64decode(_img_str), name='{}.{}'.format(name, ext))
+
+
+@csrf_exempt
+def get_dettaglio_richiesta(request, pk_richiesta):
+    if request.method == 'GET':
+        r = Richiesta.objects.get(pk=pk_richiesta)
+        files = Allegato.objects.filter(richiesta=r)
+        fotoAllegata = None
+        selfieAllegato = None
+        audioAllegato = None
+        for f in files:
+            if 'selfieAllegato' in f.file.name:
+                selfieAllegato = f
+            elif 'fotoAllegata' in f.file.name:
+                fotoAllegata = f
+            elif 'audioAllegato' in f.file.name:
+                audioAllegato = f
+
+        data = {
+            'imei': r.imei,
+            'motivo': r.tipologia,
+            'is_supporto': r.is_supporto,
+            'stato': r.stato,
+            'data': r.data,
+            'long': r.long,
+            'lat': r.lat,
+            'descrizione': r.informazioni,
+            'vettura': r.vettura.identificativo,
+            'vettura_imei': r.vettura.imei,
+            'selfie': selfieAllegato.file.url,
+            'foto': fotoAllegata.file.url,
+            'audio': audioAllegato.file.url
+        }
+        return HttpResponse(json.dumps(data, cls=DjangoJSONEncoder))
+    return HttpResponseForbidden()

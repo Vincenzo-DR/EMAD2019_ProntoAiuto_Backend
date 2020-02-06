@@ -8,7 +8,6 @@ from django.db import models
 # Create your models here.
 from vetture_service.models import Vettura
 
-
 class Richiesta(models.Model):
     INCIDENTE = 'Incidente'
     INCENDIO = 'Incendio'
