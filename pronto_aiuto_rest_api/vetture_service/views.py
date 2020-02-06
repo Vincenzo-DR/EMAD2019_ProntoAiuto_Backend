@@ -113,13 +113,6 @@ def updateDisponibilita(request, imei):
     form = VetturaUpdateDisponibilita(data=request.POST)
     if request.method == "POST":
         if form.is_valid():
-            disponibile = form.cleaned_data['disponibile']
-            vettura.disponibile = disponibile
+            vettura.disponibile = form.cleaned_data['disponibile']
             vettura.save()
-            if(disponibile):
-                richieste = Richiesta.objects.filter(vettura=vettura)
-                for r in richieste:
-                    if r.stato != r.RISOLTA:
-                        r.stato = r.RISOLTA
-                        r.save()
             return HttpResponse(vettura.serialize()) \
