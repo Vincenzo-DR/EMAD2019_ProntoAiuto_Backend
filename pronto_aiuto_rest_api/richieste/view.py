@@ -132,7 +132,6 @@ def base64_file(data, formato, name=None):
         name = _name.split(":")[-1]
     return ContentFile(base64.b64decode(_img_str), name='{}.{}'.format(name, ext))
 
-
 @csrf_exempt
 def get_dettaglio_richiesta(request, pk_req):
     if request.method == 'GET':

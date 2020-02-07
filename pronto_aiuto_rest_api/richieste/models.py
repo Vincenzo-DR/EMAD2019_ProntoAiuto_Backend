@@ -2,14 +2,13 @@ import json
 import os
 from datetime import datetime
 
-from django.conf import settings
 from django.db import models
 
 # Create your models here.
 from vetture_service.models import Vettura
 
 class Richiesta(models.Model):
-    INCIDENTE = 'Incidente'
+    INCIDENTE = 'Incidente stradale'
     INCENDIO = 'Incendio'
     DISSESTISTATICI = 'Dissesti statici'
     FURTO = 'Furto'
@@ -27,7 +26,7 @@ class Richiesta(models.Model):
     POMPIERI = 'Pompieri'
 
     MOTIVO_CHOICES = {
-        INCIDENTE: 'Incidente',
+        INCIDENTE: 'Incidente stradale',
         INCENDIO: 'Incendio',
         DISSESTISTATICI: 'Dissesti statici',
         FURTO: 'Furto',
