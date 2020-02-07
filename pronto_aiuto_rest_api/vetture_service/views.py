@@ -75,7 +75,7 @@ def vettura_update(request, pk):
             vettura.playerId = form.cleaned_data['playerId']
             vettura.forza_ordine = form.cleaned_data['forza_ordine']
             vettura.save()
-            return HttpResponse(vettura.serialize())\
+            return HttpResponse(vettura.serialize())
 
 @csrf_exempt
 def update_position(request, imei):
@@ -122,4 +122,4 @@ def updateDisponibilita(request, imei):
                     if r.stato != r.RISOLTA:
                         r.stato = r.RISOLTA
                         r.save()
-            return HttpResponse(vettura.serialize()) \
+            return HttpResponse(vettura.serialize())

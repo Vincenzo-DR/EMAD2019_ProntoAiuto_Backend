@@ -21,7 +21,7 @@ from vetture_service.views import push_to_nearest
 def richieste_list(request):
     if request.method == 'GET':
         richieste = Richiesta.objects.all().values('id', 'imei', 'tipologia', 'stato', 'informazioni', 'data', 'lat',
-                                                   'long', 'is_supporto', 'forza_ordine')
+                                                   'long', 'is_supporto', 'forza_ordine').order_by('-data')
         serialized = json.dumps(list(richieste), cls=DjangoJSONEncoder)
         return HttpResponse(serialized)
     return HttpResponseForbidden()
