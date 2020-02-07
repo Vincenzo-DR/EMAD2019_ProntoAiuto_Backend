@@ -57,11 +57,12 @@ def crea_richiesta_cittadino(request):
                                   )
             richiesta.save()
             if img_data:
-                Allegato(file=base64_file(img_data, 'fotoAllegata'), richiesta=richiesta).save()
+                Allegato(file=base64_file(img_data, 'jpeg', 'fotoAllegata'), richiesta=richiesta).save()
             if audio_data:
-                Allegato(file=base64_file(audio_data, 'audioAllegato'), richiesta=richiesta).save()
+                Allegato(file=base64_file(audio_data, 'mp3', 'audioAllegato'), richiesta=richiesta).save()
+                # Allegato(file=base64_file(audio_data, 'ogg', 'audioAllegato'), richiesta=richiesta).save()
             if selfie_data:
-                Allegato(file=base64_file('data:image/jpeg;base64,' + selfie_data, 'selfieAllegato'), richiesta=richiesta).save()
+                Allegato(file=base64_file('data:image/jpeg;base64,' + selfie_data, 'jpeg', 'selfieAllegato'), richiesta=richiesta).save()
             response = push_to_nearest(richiesta.pk, richiesta.tipologia, richiesta.lat, richiesta.long)
             print(response)
             return HttpResponse(richiesta.serialize())
@@ -123,9 +124,10 @@ def get_richiesta_cittadino(request, imei):
         return HttpResponse(json.dumps(richieste_list, cls=DjangoJSONEncoder))
     return HttpResponseForbidden()
 
-def base64_file(data, name=None):
+def base64_file(data, formato, name=None):
     _format, _img_str = data.split(';base64,')
     _name, ext = _format.split('/')
+    ext = formato
     if not name:
         name = _name.split(":")[-1]
     return ContentFile(base64.b64decode(_img_str), name='{}.{}'.format(name, ext))
@@ -139,6 +141,11 @@ def get_dettaglio_richiesta(request, pk_req):
         fotoAllegata = None
         selfieAllegato = None
         audioAllegato = None
+        vetturaImei = None
+        vetturaId = None
+        if r.vettura:
+            vetturaImei = r.vettura.imei
+            vetturaId = r.vettura.identificativo
         for f in files:
             if 'selfieAllegato' in f.file.name:
                 selfieAllegato = f
@@ -156,11 +163,14 @@ def get_dettaglio_richiesta(request, pk_req):
             'long': r.long,
             'lat': r.lat,
             'informazioni': r.informazioni,
-            'vettura': r.vettura.identificativo,
-            'vettura_imei': r.vettura.imei,
+            'forza_ordine': r.forza_ordine,
+            'vettura': vetturaId,
+            'vettura_imei': vetturaImei,
             'selfie': selfieAllegato.file.url,
             'foto': fotoAllegata.file.url,
-            'audio': audioAllegato.file.url
+            'audio': audioAllegato.file.url,
+            'linea_verde_richiesta': r.linea_verde_richiesta,
+            'tempoDiArrivo': r.tempoDiArrivo
         }
         return HttpResponse(json.dumps(data, cls=DjangoJSONEncoder))
     return HttpResponseForbidden()
