@@ -18,7 +18,7 @@ import requests
 @csrf_exempt
 def vetture_list(request):
     if request.method == 'GET':
-        vetture = Vettura.objects.all().values('id', 'identificativo', 'tipologia', 'stato', 'imei', 'playerId', 'forza_ordine')
+        vetture = Vettura.objects.all().values('id', 'identificativo', 'tipologia', 'stato', 'imei', 'playerId', 'forza_ordine', 'disponibile')
         serialized = json.dumps(list(vetture), cls=DjangoJSONEncoder)
         return HttpResponse(serialized)
 
