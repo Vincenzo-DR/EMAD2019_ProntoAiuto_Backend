@@ -9,7 +9,7 @@ from django.core.files.base import ContentFile
 
 from Helper.NotifichePush import sendNotificaToCittadino
 from richieste.models import Richiesta, Allegato
-from richieste.forms import RichiestaCreateForm
+from richieste.forms import RichiestaCreateForm, RichiestaLineaVerdeForm
 
 import base64
 
@@ -172,4 +172,14 @@ def get_dettaglio_richiesta(request, pk_req):
             'tempoDiArrivo': r.tempoDiArrivo
         }
         return HttpResponse(json.dumps(data, cls=DjangoJSONEncoder))
+    return HttpResponseForbidden()
+
+
+@csrf_exempt
+def richiesta_linea_verde(request, pk_req):
+    richiesta = Richiesta.objects.get(id=pk_req)
+    if request.method == 'POST':
+        richiesta.linea_verde_richiesta = True
+        richiesta.save()
+        return HttpResponse(richiesta.serialize())
     return HttpResponseForbidden()

@@ -2,6 +2,7 @@ import json
 
 from django.core.serializers.json import DjangoJSONEncoder
 from django.http import HttpResponse
+from django.http import HttpResponseForbidden
 from django.shortcuts import get_object_or_404
 
 from django.views.decorators.csrf import csrf_exempt
@@ -123,3 +124,15 @@ def updateDisponibilita(request, imei):
                         r.stato = r.RISOLTA
                         r.save()
             return HttpResponse(vettura.serialize())
+
+
+@csrf_exempt
+def get_disponibilita_vettura(request, imei):
+    if request.method == 'GET':
+        v = Vettura.objects.get(imei=imei)
+        data = {
+            'disponibile': v.disponibile,
+        }
+        return HttpResponse(json.dumps(data, cls=DjangoJSONEncoder))
+    return HttpResponseForbidden()
+
