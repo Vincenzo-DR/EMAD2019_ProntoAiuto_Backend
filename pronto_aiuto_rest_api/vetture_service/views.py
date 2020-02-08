@@ -1,8 +1,7 @@
 import json
 
 from django.core.serializers.json import DjangoJSONEncoder
-from django.http import HttpResponse
-from django.http import HttpResponseForbidden
+from django.http import HttpResponse, HttpResponseForbidden
 from django.shortcuts import get_object_or_404
 
 from django.views.decorators.csrf import csrf_exempt
@@ -125,6 +124,26 @@ def updateDisponibilita(request, imei):
                         r.save()
             return HttpResponse(vettura.serialize())
 
+@csrf_exempt
+def get_dettaglio_vettura(request, pk_vet):
+    if request.method == 'GET':
+        v = get_object_or_404(Vettura, pk=pk_vet)
+        r_filter = Richiesta.objects.filter(vettura=v).exclude(stato__in=[Richiesta.RISOLTA])
+        if r_filter.exists():
+            r = r_filter.first()
+        else:
+            r = None
+        data = {
+            'imei': v.imei,
+            'forza_ordine': v.forza_ordine,
+            'identificativo': v.identificativo,
+            'tipologia': v.tipologia,
+            'stato': v.stato,
+            'disponibile': v.disponibile,
+            'richiesta_attuale_assegnata': r
+        }
+        return HttpResponse(json.dumps(data, cls=DjangoJSONEncoder))
+    return HttpResponseForbidden()
 
 @csrf_exempt
 def get_disponibilita_vettura(request, imei):

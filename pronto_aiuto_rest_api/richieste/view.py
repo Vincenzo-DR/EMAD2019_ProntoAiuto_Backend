@@ -9,7 +9,7 @@ from django.core.files.base import ContentFile
 
 from Helper.NotifichePush import sendNotificaToCittadino
 from richieste.models import Richiesta, Allegato
-from richieste.forms import RichiestaCreateForm, RichiestaLineaVerdeForm
+from richieste.forms import RichiestaCreateForm
 
 import base64
 
