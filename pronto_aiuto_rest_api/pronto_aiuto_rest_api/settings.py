@@ -167,10 +167,8 @@ CORS_ALLOW_HEADERS = [
 
 CORS_ORIGIN_WHITELIST = [
     'http://127.0.0.1:4300',
-    'http://127.0.0.1:8100',
 ]
 
 CSRF_TRUSTED_ORIGINS = [
     'http://127.0.0.1:4300',
-    'http://127.0.0.1:8100',
 ]
