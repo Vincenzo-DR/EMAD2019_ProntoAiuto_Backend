@@ -24,6 +24,7 @@ class Richiesta(models.Model):
     CARABINIERI = 'Carabinieri'
     PARAMEDICI = 'Paramedici'
     POMPIERI = 'Pompieri'
+    SUPPORTO= 'Supporto'
 
     MOTIVO_CHOICES = {
         INCIDENTE: 'Incidente stradale',
@@ -32,12 +33,8 @@ class Richiesta(models.Model):
         FURTO: 'Furto',
         VIOLENZADOMESTICA: 'Violenza domestica',
         MALOREIMPROVVISO: 'Malore improvviso',
-        ALTRO: 'Altro'
-    }
-
-    IS_SUPPORTO = {
-        TRUE: 'True',
-        FALSE: 'False'
+        ALTRO: 'Altro',
+        SUPPORTO: 'Supporto'
     }
 
     STATO_CHOICES = {
@@ -56,7 +53,7 @@ class Richiesta(models.Model):
     imei = models.CharField(max_length=100)
     tipologia = models.CharField(choices=MOTIVO_CHOICES.items(), max_length=100, null=True)
     forza_ordine = models.CharField(choices=FO_CHOICES.items(), max_length=100, null=True)
-    is_supporto = models.CharField(choices=IS_SUPPORTO.items(), max_length=100, null=True, default="False")
+    is_supporto = models.CharField(max_length=100, null=True, default=None)
     stato = models.CharField(choices=STATO_CHOICES.items(), max_length=100, null=True)
     informazioni = models.CharField(max_length=300, null=True)
     data = models.CharField(null=True, max_length=100)

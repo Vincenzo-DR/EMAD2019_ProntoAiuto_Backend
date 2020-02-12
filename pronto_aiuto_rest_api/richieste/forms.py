@@ -11,3 +11,8 @@ class RichiestaCreateForm(forms.ModelForm):
     class Meta:
         model = Richiesta
         fields = {'imei', 'tipologia', 'informazioni', 'is_supporto', 'long', 'lat', 'playerId', 'forza_ordine'}
+
+class RichiestaSupportoForm(forms.ModelForm):
+    class Meta:
+        model = Richiesta
+        fields = {'pk', 'imei', 'forza_ordine', 'playerId'}

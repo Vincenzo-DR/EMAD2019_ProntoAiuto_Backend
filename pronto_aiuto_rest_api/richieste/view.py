@@ -9,7 +9,7 @@ from django.core.files.base import ContentFile
 
 from Helper.NotifichePush import sendNotificaToCittadino
 from richieste.models import Richiesta, Allegato
-from richieste.forms import RichiestaCreateForm, RichiestaLineaVerdeForm
+from richieste.forms import RichiestaCreateForm, RichiestaSupportoForm
 
 import base64
 
@@ -66,6 +66,39 @@ def crea_richiesta_cittadino(request):
             response = push_to_nearest(richiesta.pk, richiesta.tipologia, richiesta.lat, richiesta.long)
             print(response)
             return HttpResponse(richiesta.serialize())
+    return HttpResponseForbidden()
+
+
+@csrf_exempt
+def crea_richiesta_supporto(request):
+    if request.method == 'POST':
+        form = RichiestaSupportoForm(data=request.POST)
+        if form.is_valid():
+            pk = form.cleaned_data['pk_req']
+            imei = form.cleaned_data['imei']
+            playerId = form.cleaned_data['playerId']
+            fo = form.cleaned_data['forza_ordine']
+            richiestaMaster=Richiesta.objects.get(id=pk)
+            subRichiesta = Richiesta(imei=imei,
+                                  tipologia=richiestaMaster.tipologia,
+                                  stato=Richiesta.CREATA,
+                                  informazioni=richiestaMaster.informazioni,
+                                  data=richiestaMaster.data,
+                                  is_supporto=pk,
+                                  linea_verde_richiesta=False,
+                                  long=richiestaMaster.long,
+                                  lat=richiestaMaster.lat,
+                                  playerId=playerId,
+                                  forza_ordine=fo
+            )
+            subRichiesta.save()
+            allegati = Allegato.objects.filter(richiesta=richiestaMaster)
+            for a in allegati:
+                a_clone = Allegato(file=a.file, richiesta=subRichiesta)
+                a_clone.save()
+            response = push_to_nearest(subRichiesta.pk, subRichiesta.tipologia, subRichiesta.lat, subRichiesta.long)
+            print(response)
+            return HttpResponse(subRichiesta.serialize())
     return HttpResponseForbidden()
 
 

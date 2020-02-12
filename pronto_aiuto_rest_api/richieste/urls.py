@@ -1,7 +1,7 @@
 from django.conf.urls import url
 
 from richieste.view import richieste_list, crea_richiesta_cittadino, rifiuta_richiesta, accetta_richiesta, get_richiesta, completa_richiesta, get_richiesta_cittadino, \
-    get_dettaglio_richiesta, richiesta_linea_verde
+    get_dettaglio_richiesta, richiesta_linea_verde, crea_richiesta_supporto
 
 urlpatterns = [
     url(regex='^list/$',
@@ -10,6 +10,9 @@ urlpatterns = [
     url(regex='^create/$',
         view=crea_richiesta_cittadino,
         name='richiesta_create'),
+    url(regex='^create-supporto/$',
+        view=crea_richiesta_supporto,
+        name='richiesta_create_supporto'),
     url(regex='^rifiuta/(?P<imei>\w+)/(?P<pk_req>[0-9]+)/$',
         view=rifiuta_richiesta,
         name='rifiuta_richiesta'),
