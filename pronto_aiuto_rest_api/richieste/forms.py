@@ -13,6 +13,7 @@ class RichiestaCreateForm(forms.ModelForm):
         fields = {'imei', 'tipologia', 'informazioni', 'is_supporto', 'long', 'lat', 'playerId', 'forza_ordine'}
 
 class RichiestaSupportoForm(forms.ModelForm):
+    id_richiesta = forms.CharField(required=False)
     class Meta:
         model = Richiesta
-        fields = {'pk', 'imei', 'forza_ordine', 'playerId'}
+        fields = {'imei', 'forza_ordine', 'playerId'}

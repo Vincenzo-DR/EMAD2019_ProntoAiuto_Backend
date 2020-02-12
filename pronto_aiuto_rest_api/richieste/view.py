@@ -76,7 +76,7 @@ def crea_richiesta_supporto(request):
     if request.method == 'POST':
         form = RichiestaSupportoForm(data=request.POST)
         if form.is_valid():
-            pk = form.cleaned_data['pk_req']
+            pk = form.cleaned_data['id_richiesta']
             imei = form.cleaned_data['imei']
             playerId = form.cleaned_data['playerId']
             fo = form.cleaned_data['forza_ordine']
@@ -184,11 +184,11 @@ def get_dettaglio_richiesta(request, pk_req):
             vetturaIdDettaglio = r.vettura.id
         for f in files:
             if 'selfieAllegato' in f.file.name:
-                selfieAllegato = f
+                selfieAllegato = f.file.url
             elif 'fotoAllegata' in f.file.name:
-                fotoAllegata = f
+                fotoAllegata = f.file.url
             elif 'audioAllegato' in f.file.name:
-                audioAllegato = f
+                audioAllegato = f.file.url
 
         data = {
             'imei': r.imei,
@@ -203,9 +203,9 @@ def get_dettaglio_richiesta(request, pk_req):
             'vettura': vetturaId,
             'vettura_imei': vetturaImei,
             'vetturaIdDettaglio': vetturaIdDettaglio,
-            'selfie': selfieAllegato.file.url,
-            'foto': fotoAllegata.file.url,
-            'audio': audioAllegato.file.url,
+            'selfie': selfieAllegato,
+            'foto': fotoAllegata,
+            'audio': audioAllegato,
             'linea_verde_richiesta': r.linea_verde_richiesta,
             'tempoDiArrivo': r.tempoDiArrivo
         }
