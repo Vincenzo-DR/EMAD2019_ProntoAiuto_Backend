@@ -1,6 +1,6 @@
 from django.conf.urls import url
 from vetture_service.views import vetture_list, vettura_delete, vettura_create, vettura_update, vetture_list_position, \
-    update_position, updateDisponibilita, get_disponibilita_vettura
+    update_position, updateDisponibilita, get_dettaglio_vettura, get_disponibilita_vettura
 
 urlpatterns = [
     url(regex='^list/$',
@@ -24,6 +24,9 @@ urlpatterns = [
     url(regex='^update-disp/(?P<imei>\w+)/$',
         view=updateDisponibilita,
         name='update_disp'),
+    url(regex='^/(?P<pk_vet>[0-9]+)/details/$',
+        view=get_dettaglio_vettura,
+        name='get_dettaglio_vettura'),
     url(regex='^get-disp/(?P<imei>\w+)/$',
         view=get_disponibilita_vettura,
         name='get_disp'),
