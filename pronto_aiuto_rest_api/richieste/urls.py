@@ -1,7 +1,8 @@
 from django.conf.urls import url
 
-from richieste.view import richieste_list, crea_richiesta_cittadino, rifiuta_richiesta, accetta_richiesta, get_richiesta, completa_richiesta, get_richiesta_cittadino, \
-    get_dettaglio_richiesta, richiesta_linea_verde, crea_richiesta_supporto
+from richieste.view import richieste_list, crea_richiesta_cittadino, rifiuta_richiesta, accetta_richiesta, \
+    get_richiesta, completa_richiesta, get_richiesta_cittadino, \
+    get_dettaglio_richiesta, richiesta_linea_verde, get_statistiche, crea_richiesta_supporto
 
 urlpatterns = [
     url(regex='^list/$',
@@ -34,5 +35,8 @@ urlpatterns = [
     url(regex='^richiesta-linea-verde/(?P<pk_req>[0-9]+)/$',
         view=richiesta_linea_verde,
         name='richiesta_linea_verde'),
+    url(regex='^get_statistiche/$',
+        view=get_statistiche,
+        name='get_statistiche'),
 
 ]

@@ -88,6 +88,7 @@ def update_position(request, imei):
             posizione.long = form.cleaned_data['long']
             posizione.save()
             return HttpResponse(status=200)
+    return HttpResponseForbidden()
 
 
 def push_to_nearest(pk_request, tipo_request, lat_req, long_req):
@@ -129,8 +130,9 @@ def get_dettaglio_vettura(request, pk_vet):
     if request.method == 'GET':
         v = get_object_or_404(Vettura, pk=pk_vet)
         r_filter = Richiesta.objects.filter(vettura=v).exclude(stato__in=[Richiesta.RISOLTA])
+        pos = get_object_or_404(Posizione, vettura=v)
         if r_filter.exists():
-            r = r_filter.first()
+            r = r_filter.first().id
         else:
             r = None
         data = {
@@ -140,7 +142,10 @@ def get_dettaglio_vettura(request, pk_vet):
             'tipologia': v.tipologia,
             'stato': v.stato,
             'disponibile': v.disponibile,
-            'richiesta_attuale_assegnata': r
+            'richiesta_attuale_assegnata': r,
+            'latitudine': pos.lat,
+            'longitudine': pos.long,
+            'agg_pos': pos.ultimo_aggiornamento
         }
         return HttpResponse(json.dumps(data, cls=DjangoJSONEncoder))
     return HttpResponseForbidden()

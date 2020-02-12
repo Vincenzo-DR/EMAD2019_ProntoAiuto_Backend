@@ -1,7 +1,9 @@
 import datetime
 import json
+from decimal import Decimal
 
 from django.core.serializers.json import DjangoJSONEncoder
+from django.db.models import Avg, Count
 from django.http import HttpResponse, HttpResponseForbidden
 from django.shortcuts import get_object_or_404
 from django.views.decorators.csrf import csrf_exempt
@@ -21,7 +23,7 @@ from vetture_service.views import push_to_nearest
 def richieste_list(request):
     if request.method == 'GET':
         richieste = Richiesta.objects.all().values('id', 'imei', 'tipologia', 'stato', 'informazioni', 'data', 'lat',
-                                                   'long', 'is_supporto', 'forza_ordine').order_by('-data')
+                                                   'long', 'is_supporto', 'forza_ordine').order_by('-id')
         serialized = json.dumps(list(richieste), cls=DjangoJSONEncoder)
         return HttpResponse(serialized)
     return HttpResponseForbidden()
@@ -175,9 +177,11 @@ def get_dettaglio_richiesta(request, pk_req):
         audioAllegato = None
         vetturaImei = None
         vetturaId = None
+        vetturaIdDettaglio = None
         if r.vettura:
             vetturaImei = r.vettura.imei
             vetturaId = r.vettura.identificativo
+            vetturaIdDettaglio = r.vettura.id
         for f in files:
             if 'selfieAllegato' in f.file.name:
                 selfieAllegato = f
@@ -198,6 +202,7 @@ def get_dettaglio_richiesta(request, pk_req):
             'forza_ordine': r.forza_ordine,
             'vettura': vetturaId,
             'vettura_imei': vetturaImei,
+            'vetturaIdDettaglio': vetturaIdDettaglio,
             'selfie': selfieAllegato.file.url,
             'foto': fotoAllegata.file.url,
             'audio': audioAllegato.file.url,
@@ -215,4 +220,43 @@ def richiesta_linea_verde(request, pk_req):
         richiesta.linea_verde_richiesta = True
         richiesta.save()
         return HttpResponse(richiesta.serialize())
+    return HttpResponseForbidden()
+
+
+@csrf_exempt
+def get_statistiche(request):
+    if request.method == 'GET':
+        richieste = Richiesta.objects.all()
+        n_richieste = richieste.count()
+        n_vetture = Vettura.objects.filter(stato=Vettura.OPERATIVA).count()
+        n_green_line = Richiesta.objects.filter(linea_verde_richiesta=True).count()
+        n_polizia = Richiesta.objects.filter(forza_ordine=Richiesta.POLIZIA).count()
+        n_carabinieri = Richiesta.objects.filter(forza_ordine=Richiesta.CARABINIERI).count()
+        n_pompieri = Richiesta.objects.filter(forza_ordine=Richiesta.POMPIERI).count()
+        n_paramedici = Richiesta.objects.filter(forza_ordine=Richiesta.PARAMEDICI).count()
+        richieste_mensili = list(richieste.extra({'month': "to_char(Date(data), 'MM')", "year": "extract(year from Date(data))"}).values('month', 'year').annotate(Count('id')))
+        richieste_mensili_list = [0] * 12
+        for r in richieste_mensili:
+            richieste_mensili_list[int(r['month'])-1] = r['id__count']
+        greenline_mensili = list(richieste.filter(linea_verde_richiesta=True).extra({'month': "to_char(Date(data), 'MM')", "year": "extract(year from Date(data))"}).values('month', 'year').annotate(Count('id')))
+        greenline_mensili_list = [0] * 12
+        for r in greenline_mensili:
+            greenline_mensili_list[int(r['month'])-1] = r['id__count']
+        tempi_di_arrivo = list(richieste.extra({'month': "to_char(Date(data), 'MM')", "year": "extract(year from Date(data))"}).values('month', 'year').annotate(Avg('tempoDiArrivo')))
+        tempi_di_arrivo_list = [0] * 12
+        for t in tempi_di_arrivo:
+            tempi_di_arrivo_list[int(t['month'])-1] = float(format(t['tempoDiArrivo__avg']/60, '.2f'))
+        data = {
+            'n_richieste': n_richieste,
+            'n_vetture': n_vetture,
+            'n_green_line': n_green_line,
+            'n_polizia': n_polizia,
+            'n_carabinieri': n_carabinieri,
+            'n_pompieri': n_pompieri,
+            'n_paramedici': n_paramedici,
+            'tempi_di_arrivo': tempi_di_arrivo_list,
+            'richieste_mensili': richieste_mensili_list,
+            'green_line_mensili': greenline_mensili_list
+        }
+        return HttpResponse(json.dumps(data, cls=DjangoJSONEncoder))
     return HttpResponseForbidden()
