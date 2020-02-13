@@ -12,10 +12,10 @@ def sendNotificaToFO(playerId, pk_request, tipo_request, richiesta_from):
         payload = {"app_id": "a25229e0-e3d2-419c-8706-8c0abbe60353",
                    "include_player_ids": [playerId],
                    "headings": {"en": "Nuova richiesta di soccorso"},
-                   "contents": {"en": "Una voltante ha bisogno del tuo aiuto.",
-                   "data": { "req_pk": pk_request, "richiesta_from": richiesta_from,
-                            "lat": richiesta.lat, "long": richiesta.long }
-                   }}
+                   "contents": {"en": "Una voltante ha bisogno del tuo aiuto."},
+                   "data": {"req_pk": pk_request, "richiesta_from": richiesta_from,
+                            "lat": richiesta.lat, "long": richiesta.long}
+                   }
     else:
         payload = {"app_id": "a25229e0-e3d2-419c-8706-8c0abbe60353",
                    "include_player_ids": [playerId],

@@ -1,6 +1,5 @@
 import datetime
 import json
-from decimal import Decimal
 
 from django.core.serializers.json import DjangoJSONEncoder
 from django.db.models import Avg, Count
@@ -9,7 +8,7 @@ from django.shortcuts import get_object_or_404
 from django.views.decorators.csrf import csrf_exempt
 from django.core.files.base import ContentFile
 
-import StringIO
+import io
 
 from Helper.NotifichePush import sendNotificaToCittadino
 from richieste.models import Richiesta, Allegato
@@ -67,7 +66,10 @@ def crea_richiesta_cittadino(request):
                 # Allegato(file=base64_file(audio_data, 'ogg', 'audioAllegato'), richiesta=richiesta).save()
             if selfie_data:
                 Allegato(file=base64_file('data:image/jpeg;base64,' + selfie_data, 'jpeg', 'selfieAllegato'), richiesta=richiesta).save()
-            response = push_to_nearest(richiesta.pk, richiesta.tipologia, richiesta.lat, richiesta.long, Richiesta.RICHIESTA_DA_CITTADINO)
+            if is_supporto != None and tipologia == Richiesta.SUPPORTO:
+                response = push_to_nearest(richiesta.pk, richiesta.tipologia, richiesta.lat, richiesta.long, Richiesta.RICHIESTA_DA_FO_NO_ALLEGATI, imei)
+            else:
+                response = push_to_nearest(richiesta.pk, richiesta.tipologia, richiesta.lat, richiesta.long, Richiesta.RICHIESTA_DA_CITTADINO)
             print(response)
             return HttpResponse(richiesta.serialize())
     return HttpResponseForbidden()
@@ -98,7 +100,7 @@ def crea_richiesta_supporto(request):
             subRichiesta.save()
             allegati = Allegato.objects.filter(richiesta=richiestaMaster)
             for fl in allegati:
-                tmp_file = StringIO.StringIO(fl.file.read())
+                tmp_file = io.BytesIO(fl.file.read())
                 tmp_file = ContentFile(tmp_file.getvalue())
                 tmp_file.name = get_file_name(fl.file.name)
                 a = Allegato(file=tmp_file, richiesta=subRichiesta)

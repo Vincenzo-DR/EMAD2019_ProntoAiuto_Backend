@@ -91,18 +91,19 @@ def update_position(request, imei):
     return HttpResponseForbidden()
 
 
-def push_to_nearest(pk_request, tipo_request, lat_req, long_req, richiesta_from):
+def push_to_nearest(pk_request, tipo_request, lat_req, long_req, richiesta_from, imei=None):
     lat_end = lat_req
     long_end = long_req
     times_of_arrival = {}
     req = get_object_or_404(Richiesta, pk=pk_request)
     vetture = Vettura.objects.filter(stato=Vettura.OPERATIVA, disponibile=True, forza_ordine=req.forza_ordine)
     for vet in vetture:
-        lat_start = Posizione.objects.get(vettura=vet).lat
-        long_start = Posizione.objects.get(vettura=vet).long
-        r = requests.get('https://api.tomtom.com/routing/1/calculateRoute/{}%2C{}%3A{}%2C{}/json?computeTravelTimeFor=all&routeType=fastest&traffic=true&avoid=unpavedRoads&travelMode=car&key=pBDtSNH15AVCe1kLOKb1lgvdgWtGCHaG'.format(lat_start, long_start, lat_end, long_end))
-        seconds = (r.json()['routes'][0]['summary']['travelTimeInSeconds'])
-        times_of_arrival.update({vet.playerId: int(seconds)})
+        if vet.imei != imei:
+            lat_start = Posizione.objects.get(vettura=vet).lat
+            long_start = Posizione.objects.get(vettura=vet).long
+            r = requests.get('https://api.tomtom.com/routing/1/calculateRoute/{}%2C{}%3A{}%2C{}/json?computeTravelTimeFor=all&routeType=fastest&traffic=true&avoid=unpavedRoads&travelMode=car&key=pBDtSNH15AVCe1kLOKb1lgvdgWtGCHaG'.format(lat_start, long_start, lat_end, long_end))
+            seconds = (r.json()['routes'][0]['summary']['travelTimeInSeconds'])
+            times_of_arrival.update({vet.playerId: int(seconds)})
     playerId = min(times_of_arrival, key=times_of_arrival.get)
     req.tempoDiArrivo = times_of_arrival.get(playerId)
     req.save()
@@ -124,6 +125,7 @@ def updateDisponibilita(request, imei):
                         r.stato = r.RISOLTA
                         r.save()
             return HttpResponse(vettura.serialize())
+    return HttpResponseForbidden()
 
 @csrf_exempt
 def get_dettaglio_vettura(request, pk_vet):
