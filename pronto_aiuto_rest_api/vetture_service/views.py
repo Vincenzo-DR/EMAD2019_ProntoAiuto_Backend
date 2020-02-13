@@ -91,7 +91,7 @@ def update_position(request, imei):
     return HttpResponseForbidden()
 
 
-def push_to_nearest(pk_request, tipo_request, lat_req, long_req):
+def push_to_nearest(pk_request, tipo_request, lat_req, long_req, richiesta_from):
     lat_end = lat_req
     long_end = long_req
     times_of_arrival = {}
@@ -106,7 +106,7 @@ def push_to_nearest(pk_request, tipo_request, lat_req, long_req):
     playerId = min(times_of_arrival, key=times_of_arrival.get)
     req.tempoDiArrivo = times_of_arrival.get(playerId)
     req.save()
-    return sendNotificaToFO(playerId, pk_request, tipo_request).status_code
+    return sendNotificaToFO(playerId, pk_request, tipo_request, richiesta_from).status_code
 
 @csrf_exempt
 def updateDisponibilita(request, imei):

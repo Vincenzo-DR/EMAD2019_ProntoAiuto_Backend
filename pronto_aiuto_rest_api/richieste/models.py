@@ -27,6 +27,10 @@ class Richiesta(models.Model):
     POMPIERI = 'Pompieri'
     SUPPORTO= 'Supporto'
 
+    RICHIESTA_DA_CITTADINO = 1
+    RICHIESTA_DA_FO_NO_ALLEGATI = 2
+    RICHIESTA_DA_FO_ALLEGATI = 3
+
     MOTIVO_CHOICES = {
         INCIDENTE_STRADALE: 'Incidente stradale',
         INCIDENTE: 'Incidente',

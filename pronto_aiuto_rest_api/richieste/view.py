@@ -9,6 +9,8 @@ from django.shortcuts import get_object_or_404
 from django.views.decorators.csrf import csrf_exempt
 from django.core.files.base import ContentFile
 
+import StringIO
+
 from Helper.NotifichePush import sendNotificaToCittadino
 from richieste.models import Richiesta, Allegato
 from richieste.forms import RichiestaCreateForm, RichiestaSupportoForm
@@ -65,7 +67,7 @@ def crea_richiesta_cittadino(request):
                 # Allegato(file=base64_file(audio_data, 'ogg', 'audioAllegato'), richiesta=richiesta).save()
             if selfie_data:
                 Allegato(file=base64_file('data:image/jpeg;base64,' + selfie_data, 'jpeg', 'selfieAllegato'), richiesta=richiesta).save()
-            response = push_to_nearest(richiesta.pk, richiesta.tipologia, richiesta.lat, richiesta.long)
+            response = push_to_nearest(richiesta.pk, richiesta.tipologia, richiesta.lat, richiesta.long, Richiesta.RICHIESTA_DA_CITTADINO)
             print(response)
             return HttpResponse(richiesta.serialize())
     return HttpResponseForbidden()
@@ -95,23 +97,26 @@ def crea_richiesta_supporto(request):
             )
             subRichiesta.save()
             allegati = Allegato.objects.filter(richiesta=richiestaMaster)
-            for a in allegati:
-                a_clone = Allegato(file=a.file, richiesta=subRichiesta)
-                a_clone.save()
-            response = push_to_nearest(subRichiesta.pk, subRichiesta.tipologia, subRichiesta.lat, subRichiesta.long)
+            for fl in allegati:
+                tmp_file = StringIO.StringIO(fl.file.read())
+                tmp_file = ContentFile(tmp_file.getvalue())
+                tmp_file.name = get_file_name(fl.file.name)
+                a = Allegato(file=tmp_file, richiesta=subRichiesta)
+                a.save()
+            response = push_to_nearest(subRichiesta.pk, subRichiesta.tipologia, subRichiesta.lat, subRichiesta.long, Richiesta.RICHIESTA_DA_FO_ALLEGATI)
             print(response)
             return HttpResponse(subRichiesta.serialize())
     return HttpResponseForbidden()
 
 
 @csrf_exempt
-def rifiuta_richiesta(request, imei, pk_req):
+def rifiuta_richiesta(request, imei, pk_req, richiesta_from):
     if request.method == 'GET':
         v = get_object_or_404(Vettura, imei=imei)
         v.disponibile = False
         v.save()
         r = get_object_or_404(Richiesta, pk=pk_req)
-        response = push_to_nearest(r.pk, r.tipologia, r.lat, r.long)
+        response = push_to_nearest(r.pk, r.tipologia, r.lat, r.long, richiesta_from)
         return HttpResponse(response)
     return HttpResponseForbidden()
 
@@ -221,6 +226,11 @@ def richiesta_linea_verde(request, pk_req):
         richiesta.save()
         return HttpResponse(richiesta.serialize())
     return HttpResponseForbidden()
+
+def get_file_name(obj):
+    string = obj
+    splitted = string.split('/')
+    return splitted[-1]
 
 
 @csrf_exempt
