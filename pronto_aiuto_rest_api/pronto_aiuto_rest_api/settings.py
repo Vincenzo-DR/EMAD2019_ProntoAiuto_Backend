@@ -82,8 +82,8 @@ WSGI_APPLICATION = 'pronto_aiuto_rest_api.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'ProntoAiutoDatabase',
-        'USER': 'ProntoAiutoUser',
+        'NAME': 'prontoaiutodatabase',
+        'USER': 'prontoaiutouser',
         'PASSWORD': 'ProntoAiutoUserPassword',
         'HOST': 'localhost',
         'PORT': '5432',
